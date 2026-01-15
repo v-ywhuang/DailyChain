@@ -160,7 +160,7 @@ export default function CheckInPage() {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.4 }}
-            className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8 mb-6"
+            className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8 mb-6 gpu-accelerated"
           >
             <p className="text-2xl text-white font-medium leading-relaxed">
               {encouragement.content}
@@ -291,7 +291,7 @@ export default function CheckInPage() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-6 mb-6"
+              className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-6 mb-6 gpu-accelerated"
             >
               <h3 className="text-white font-medium mb-4">记录详情（可选）</h3>
               

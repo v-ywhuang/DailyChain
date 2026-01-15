@@ -100,7 +100,24 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // 🚀 移动端性能优化 - 仅添加 GPU 加速，不改变视觉
+    function({ addUtilities }: any) {
+      const performanceUtilities = {
+        // GPU 硬件加速（不改变外观，只提升性能）
+        '.gpu': {
+          transform: 'translateZ(0)',
+          backfaceVisibility: 'hidden',
+          perspective: '1000px',
+        },
+        // 优化触摸滚动
+        '.touch-scroll': {
+          '-webkit-overflow-scrolling': 'touch',
+        },
+      }
+      addUtilities(performanceUtilities)
+    },
+  ],
 };
 
 export default config;

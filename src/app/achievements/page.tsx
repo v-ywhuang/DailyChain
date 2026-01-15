@@ -108,7 +108,7 @@ export default function AchievementsPage() {
                 className="relative cursor-pointer group"
               >
                 {/* Glassmorphism Card */}
-                <div className="relative bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-6 h-full overflow-hidden transition-all duration-300 hover:bg-white/15 hover:border-white/30">
+                <div className="relative bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-6 h-full overflow-hidden transition-all duration-300 hover:bg-white/15 hover:border-white/30 gpu-accelerated">
                   {/* Glow Effect */}
                   <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 opacity-0 group-hover:opacity-100 transition-opacity blur-xl" />
                   
@@ -182,7 +182,7 @@ export default function AchievementsPage() {
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
               onClick={(e) => e.stopPropagation()}
-              className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8 max-w-md w-full"
+              className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-8 max-w-md w-full gpu-accelerated"
             >
               <div className="text-center">
                 <div className="text-8xl mb-6">{selectedAchievement.achievement.icon}</div>

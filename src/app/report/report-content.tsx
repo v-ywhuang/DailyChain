@@ -191,7 +191,7 @@ export default function ReportContent() {
         {/* 报告内容 */}
         <div
           ref={reportRef}
-          className="bg-gradient-to-br from-slate-800/50 to-purple-900/50 backdrop-blur-xl rounded-3xl p-8 shadow-2xl"
+          className="bg-gradient-to-br from-slate-800/50 to-purple-900/50 backdrop-blur-xl rounded-3xl p-8 shadow-2xl gpu-accelerated"
         >
           {/* 标题 */}
           <div className="text-center mb-8">
@@ -232,7 +232,7 @@ export default function ReportContent() {
           </div>
 
           {/* 个性化开场白 - 唯美小作文 */}
-          <div className="mb-8 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-white/10">
+          <div className="mb-8 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-white/10 gpu-accelerated">
             <p className="text-sm sm:text-base text-white/90 leading-relaxed text-justify indent-8">
               {generateIntro()}
             </p>
@@ -240,7 +240,7 @@ export default function ReportContent() {
 
           {/* 唯美鼓励文案（数据库随机） */}
           {encouragement && (
-            <div className="mb-8 bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-orange-500/20 backdrop-blur-sm rounded-3xl p-8 border border-white/20">
+            <div className="mb-8 bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-orange-500/20 backdrop-blur-sm rounded-3xl p-8 border border-white/20 gpu-accelerated">
               <div className="text-center">
                 <div className="text-6xl mb-4 animate-pulse">✨</div>
                 <p className="text-2xl md:text-3xl font-bold text-white leading-relaxed mb-2">

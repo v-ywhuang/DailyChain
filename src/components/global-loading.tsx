@@ -21,8 +21,11 @@ export function GlobalLoadingBar() {
   const [isVisible, setIsVisible] = useState(true)
 
   useEffect(() => {
-    // 快速启动到 30%
-    setProgress(30)
+    // 使用 requestAnimationFrame 避免同步 setState 警告
+    requestAnimationFrame(() => {
+      // 快速启动到 30%
+      setProgress(30)
+    })
     
     // 逐渐增长到 90%
     const intervals = [
@@ -148,7 +151,10 @@ export function GlobalLoadingProvider({ children }: { children: React.ReactNode 
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    return loadingController.subscribe(setIsLoading)
+    const unsubscribe = loadingController.subscribe(setIsLoading)
+    return () => {
+      unsubscribe()
+    }
   }, [])
 
   return (

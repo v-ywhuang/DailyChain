@@ -119,7 +119,7 @@ export default function HabitDetailPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900">
       {/* 顶部导航 */}
-      <div className="sticky top-0 z-40 backdrop-blur-xl bg-white/10 border-b border-white/10">
+      <div className="sticky top-0 z-40 backdrop-blur-xl bg-white/10 border-b border-white/10 gpu-accelerated">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <button
             onClick={() => router.back()}
@@ -141,7 +141,7 @@ export default function HabitDetailPage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 border border-white/20 mb-6"
+          className="bg-white/10 backdrop-blur-lg rounded-3xl p-6 border border-white/20 mb-6 gpu-accelerated"
         >
           {/* 头部：图标+名称+类别 */}
           <div className="flex items-start gap-4 mb-6">
