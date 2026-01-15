@@ -261,6 +261,100 @@ export async function getMilestoneEncouragement(
 }
 
 // ============================================
+// 获取 Report 页面专用的鼓励语（温暖唯美风格）
+// ============================================
+export async function getReportEncouragement(
+  streak?: number
+): Promise<ApiResponse<Encouragement>> {
+  try {
+    const supabase = await createServerSupabaseClient()
+    
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    if (userError || !user) {
+      throw new Error('未登录')
+    }
+    
+    // 优先选择 milestone 和 streak 类型的鼓励语
+    const contexts = streak && streak >= 7 ? ['milestone', 'streak', 'daily'] : ['daily', 'streak']
+    
+    // 获取用户最近看过的鼓励语（避免重复）
+    const { data: history } = await supabase
+      .from('user_encouragement_history')
+      .select('encouragement_id')
+      .eq('user_id', user.id)
+      .gte('shown_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+      .order('shown_at', { ascending: false })
+      .limit(20)
+    
+    const recentIds = history?.map(h => h.encouragement_id) || []
+    
+    // 构建查询 - 选择温暖治愈风格的鼓励语
+    let query = supabase
+      .from('encouragements')
+      .select('*')
+      .eq('is_active', true)
+      .is('category', null) // 只要通用鼓励语
+      .in('context', contexts)
+      .in('emotion', ['gentle', 'motivational', 'celebratory']) // 温暖风格
+    
+    // 排除最近看过的
+    if (recentIds.length > 0) {
+      query = query.not('id', 'in', `(${recentIds.join(',')})`)
+    }
+    
+    const { data, error } = await query.order('weight', { ascending: false }).limit(10)
+    
+    if (error) throw error
+    
+    if (!data || data.length === 0) {
+      // 降级：返回任意温暖鼓励语
+      const { data: fallback } = await supabase
+        .from('encouragements')
+        .select('*')
+        .eq('is_active', true)
+        .is('category', null)
+        .in('emotion', ['gentle', 'motivational'])
+        .order('weight', { ascending: false })
+        .limit(1)
+        .single()
+      
+      if (fallback) {
+        await recordEncouragementShown(fallback.id)
+        return { success: true, data: fallback }
+      }
+      
+      throw new Error('没有可用的鼓励语')
+    }
+    
+    // 根据权重随机选择
+    const totalWeight = data.reduce((sum, e) => sum + e.weight, 0)
+    let random = Math.random() * totalWeight
+    
+    let selected = data[0]
+    for (const encouragement of data) {
+      random -= encouragement.weight
+      if (random <= 0) {
+        selected = encouragement
+        break
+      }
+    }
+    
+    // 记录显示历史
+    await recordEncouragementShown(selected.id)
+    
+    return {
+      success: true,
+      data: selected
+    }
+  } catch (error: any) {
+    return {
+      success: false,
+      error: error.message
+    }
+  }
+}
+
+// ============================================
 // 获取所有鼓励语（管理用）
 // ============================================
 export async function getAllEncouragements(

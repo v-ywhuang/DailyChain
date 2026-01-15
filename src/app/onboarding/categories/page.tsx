@@ -4,13 +4,11 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { getCategoriesWithOptions } from '@/lib/api/habits'
-import Loading from '@/components/loading'
 import type { HabitCategoryWithOptions } from '@/lib/types/database.types'
 
 export default function OnboardingCategoriesPage() {
   const router = useRouter()
   const [categories, setCategories] = useState<HabitCategoryWithOptions[]>([])
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function loadData() {
@@ -18,7 +16,6 @@ export default function OnboardingCategoriesPage() {
       if (result.success && result.data) {
         setCategories(result.data)
       }
-      setLoading(false)
     }
     loadData()
   }, [])
@@ -29,10 +26,7 @@ export default function OnboardingCategoriesPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 overflow-auto">
-      {loading ? (
-        <Loading />
-      ) : (
-        <div className="container mx-auto px-4 py-12 max-w-4xl">
+      <div className="container mx-auto px-4 py-12 max-w-4xl">
         {/* 标题 */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -54,22 +48,11 @@ export default function OnboardingCategoriesPage() {
             animate={{ opacity: 1 }}
             className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl p-12 text-center"
           >
-            <div className="text-6xl mb-4">📦</div>
-            <h3 className="text-2xl font-bold text-white mb-4">数据库未初始化</h3>
+            <div className="text-6xl mb-4 animate-pulse">⏳</div>
+            <h3 className="text-2xl font-bold text-white mb-4">正在加载习惯分类...</h3>
             <p className="text-white/70 mb-6">
-              请先在 Supabase Dashboard 中执行迁移脚本
+              请稍候，我们正在为您准备精彩内容
             </p>
-            <div className="bg-black/30 rounded-lg p-4 text-left text-sm font-mono text-white/80 mb-6">
-              <p>📍 迁移脚本位置:</p>
-              <p className="text-blue-300">supabase/migrations/20260114_complete_schema.sql</p>
-              <p className="mt-4">🔗 执行步骤:</p>
-              <ol className="list-decimal list-inside space-y-1 ml-2">
-                <li>打开 <a href="https://supabase.com/dashboard" target="_blank" className="text-blue-400 hover:underline">Supabase Dashboard</a></li>
-                <li>进入项目 SQL Editor</li>
-                <li>复制迁移脚本内容并执行</li>
-                <li>刷新此页面</li>
-              </ol>
-            </div>
             <button
               onClick={() => router.push('/dashboard')}
               className="bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-full transition-all"
@@ -151,7 +134,6 @@ export default function OnboardingCategoriesPage() {
           </button>
         </motion.div>
         </div>
-      )}
     </div>
   )
 }

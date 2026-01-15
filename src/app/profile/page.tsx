@@ -3,30 +3,42 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { getUserProfile } from '@/lib/api/user'
+import { getUserProfile, updateUserProfile } from '@/lib/api/user'
 import AvatarUpload from '@/components/avatar-upload'
-import Loading from '@/components/loading'
 import type { UserProfile } from '@/lib/types/database.types'
 
 export default function ProfilePage() {
   const router = useRouter()
   const [profile, setProfile] = useState<UserProfile | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [isEditingName, setIsEditingName] = useState(false)
+  const [displayName, setDisplayName] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
 
   useEffect(() => {
     async function loadProfile() {
       const result = await getUserProfile()
       if (result.success && result.data) {
         setProfile(result.data)
+        setDisplayName(result.data.display_name || '')
       }
-      setLoading(false)
     }
     loadProfile()
   }, [])
 
-  if (loading) {
-    return <Loading />
+  const handleSaveDisplayName = async () => {
+    if (!displayName.trim()) return
+    
+    setIsSaving(true)
+    const result = await updateUserProfile({ display_name: displayName.trim() })
+    
+    if (result.success && result.data) {
+      setProfile(result.data)
+      setIsEditingName(false)
+    }
+    setIsSaving(false)
   }
+
+  // Loading 状态由页面级 Suspense 处理（顶部进度条）
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900">
@@ -85,9 +97,46 @@ export default function ProfilePage() {
 
             <div>
               <label className="text-white/60 text-sm mb-2 block">昵称</label>
-              <div className="bg-white/5 rounded-xl px-4 py-3 text-white">
-                {profile?.display_name || '未设置'}
-              </div>
+              {isEditingName ? (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    className="flex-1 bg-white/5 rounded-xl px-4 py-3 text-white border border-white/10 focus:border-purple-500 focus:outline-none"
+                    placeholder="请输入昵称"
+                    maxLength={20}
+                  />
+                  <button
+                    onClick={handleSaveDisplayName}
+                    disabled={isSaving}
+                    className="px-4 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:opacity-90 transition-all disabled:opacity-50"
+                  >
+                    {isSaving ? '保存中...' : '保存'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsEditingName(false)
+                      setDisplayName(profile?.display_name || '')
+                    }}
+                    className="px-4 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all"
+                  >
+                    取消
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <div className="flex-1 bg-white/5 rounded-xl px-4 py-3 text-white">
+                    {profile?.display_name || '未设置昵称'}
+                  </div>
+                  <button
+                    onClick={() => setIsEditingName(true)}
+                    className="px-4 py-3 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-all"
+                  >
+                    编辑
+                  </button>
+                </div>
+              )}
             </div>
 
             <div>

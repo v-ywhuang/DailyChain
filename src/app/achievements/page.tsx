@@ -27,7 +27,6 @@ interface UserAchievement {
 export default function AchievementsPage() {
   const router = useRouter()
   const [achievements, setAchievements] = useState<UserAchievement[]>([])
-  const [loading, setLoading] = useState(true)
   const [selectedAchievement, setSelectedAchievement] = useState<UserAchievement | null>(null)
 
   useEffect(() => {
@@ -42,22 +41,11 @@ export default function AchievementsPage() {
       } else {
         console.error('❌ 加载失败:', result.error)
       }
-      setLoading(false)
     }
     loadAchievements()
   }, [])
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 flex items-center justify-center">
-        <motion.div
-          className="w-16 h-16 rounded-full border-4 border-white/20 border-t-white"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-        />
-      </div>
-    )
-  }
+  // Loading 状态由页面级 Suspense 处理（顶部进度条）
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 overflow-auto pb-20">

@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation'
 import { getUserHabits } from '@/lib/api/habits'
 import { createCheckIn } from '@/lib/api/check-ins'
 import { getSmartEncouragement } from '@/lib/api/encouragements'
-import Loading from '@/components/loading'
 import type { UserHabitWithDetails, Encouragement } from '@/lib/types/database.types'
 
 export default function CheckInPage() {
@@ -14,11 +13,11 @@ export default function CheckInPage() {
   const [habits, setHabits] = useState<UserHabitWithDetails[]>([])
   const [selectedHabit, setSelectedHabit] = useState<UserHabitWithDetails | null>(null)
   const [selectedOptions, setSelectedOptions] = useState<Set<string>>(new Set())
-  const [loading, setLoading] = useState(true)
   const [checking, setChecking] = useState(false)
   const [encouragement, setEncouragement] = useState<Encouragement | null>(null)
   const [showSuccess, setShowSuccess] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  const [isInitialLoading, setIsInitialLoading] = useState(true) // 添加初始加载状态
 
   // 个性化数据
   const [weight, setWeight] = useState('')
@@ -42,7 +41,7 @@ export default function CheckInPage() {
           setSelectedOptions(allOptions)
         }
       }
-      setLoading(false)
+      setIsInitialLoading(false) // 数据加载完成
     }
     loadData()
   }, [])
@@ -103,15 +102,10 @@ export default function CheckInPage() {
     setChecking(false)
   }
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900">
-        <Loading />
-      </div>
-    )
-  }
+  // Loading 状态由页面级 Suspense 处理（顶部进度条）
 
-  if (habits.length === 0) {
+  // 只有加载完成且确认无习惯时才显示"都完成了"
+  if (!isInitialLoading && habits.length === 0) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 flex items-center justify-center">
         <div className="text-center">

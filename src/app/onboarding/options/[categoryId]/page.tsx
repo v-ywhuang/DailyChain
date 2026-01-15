@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { getHabitOptions, createUserHabit } from '@/lib/api/habits'
-import Loading from '@/components/loading'
 import type { HabitOption } from '@/lib/types/database.types'
 
 export default function OnboardingOptionsPage({
@@ -19,7 +18,6 @@ export default function OnboardingOptionsPage({
   const [categoryId, setCategoryId] = useState<string>('')
   const [options, setOptions] = useState<HabitOption[]>([])
   const [selectedOptions, setSelectedOptions] = useState<Set<string>>(new Set())
-  const [loading, setLoading] = useState(true)
   const [creating, setCreating] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
@@ -39,7 +37,6 @@ export default function OnboardingOptionsPage({
         const popularOptions = result.data.filter(opt => opt.is_popular).slice(0, 3)
         setSelectedOptions(new Set(popularOptions.map(opt => opt.id)))
       }
-      setLoading(false)
     }
     init()
   }, [params])
@@ -105,10 +102,7 @@ export default function OnboardingOptionsPage({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 overflow-auto">
-      {loading ? (
-        <Loading />
-      ) : (
-        <div className="container mx-auto px-4 py-12 max-w-4xl">
+      <div className="container mx-auto px-4 py-12 max-w-4xl">
         {/* 标题 */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -371,7 +365,6 @@ export default function OnboardingOptionsPage({
           )}
         </AnimatePresence>
         </div>
-      )}
     </div>
   )
 }

@@ -1,6 +1,7 @@
 import { Metadata } from 'next'
 import { Suspense } from 'react'
 import LoginClient from './login-client'
+import { GlobalLoadingBar } from '@/components/global-loading'
 
 export const metadata: Metadata = {
   title: '登录 - DailyChain',
@@ -9,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">加载中...</div>}>
+    <Suspense fallback={<GlobalLoadingBar />}>
       <LoginClient />
     </Suspense>
   )

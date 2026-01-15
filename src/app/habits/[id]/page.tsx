@@ -5,7 +5,6 @@ import { motion } from 'framer-motion'
 import { useRouter, useParams } from 'next/navigation'
 import { getHabitById } from '@/lib/api/habits'
 import { getCheckInHistory } from '@/lib/api/check-ins'
-import Loading from '@/components/loading'
 import type { UserHabitWithDetails, CheckIn } from '@/lib/types/database.types'
 
 export default function HabitDetailPage() {
@@ -15,7 +14,7 @@ export default function HabitDetailPage() {
 
   const [habit, setHabit] = useState<UserHabitWithDetails | null>(null)
   const [checkIns, setCheckIns] = useState<CheckIn[]>([])
-  const [loading, setLoading] = useState(true)
+  const [isInitialLoading, setIsInitialLoading] = useState(true) // 添加初始加载状态
   const [stats, setStats] = useState({
     currentStreak: 0,
     longestStreak: 0,
@@ -86,17 +85,16 @@ export default function HabitDetailPage() {
           totalCheckIns
         })
       }
-
-      setLoading(false)
+      
+      setIsInitialLoading(false) // 数据加载完成
     }
     loadData()
   }, [habitId])
 
-  if (loading) {
-    return <Loading />
-  }
+  // Loading 状态由页面级 Suspense 处理（顶部进度条）
 
-  if (!habit) {
+  // 只有加载完成且确认不存在时才显示"不存在"页面
+  if (!isInitialLoading && !habit) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 flex items-center justify-center p-4">
         <div className="text-white text-center">
@@ -111,6 +109,11 @@ export default function HabitDetailPage() {
         </div>
       </div>
     )
+  }
+
+  // 加载中或数据未准备好，不渲染任何内容（由 Suspense 处理）
+  if (!habit) {
+    return null
   }
 
   return (

@@ -8,7 +8,6 @@ import { createClient } from '@/lib/supabase/client'
 import { getUserHabits } from '@/lib/api/habits'
 import { getAllHabitsStats } from '@/lib/api/stats'
 import { getUserProfile } from '@/lib/api/user'
-import Loading from '@/components/loading'
 import Image from 'next/image'
 import type { UserHabitWithDetails, HabitStats } from '@/lib/types/database.types'
 
@@ -23,10 +22,10 @@ export default function DashboardClient({ user }: DashboardClientProps) {
   
   const [habits, setHabits] = useState<UserHabitWithDetails[]>([])
   const [stats, setStats] = useState<HabitStats | null>(null)
-  const [loading, setLoading] = useState(true)
   const [showUserMenu, setShowUserMenu] = useState(false)
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null)
   const [userPlan, setUserPlan] = useState<'free' | 'pro'>('free')
+  const [isInitialLoading, setIsInitialLoading] = useState(true) // 添加初始加载状态
 
   async function loadDashboardData() {
     const [habitsResult, statsResult, profileResult] = await Promise.all([
@@ -47,8 +46,8 @@ export default function DashboardClient({ user }: DashboardClientProps) {
       setAvatarUrl(profileResult.data.avatar_url)
       setUserPlan(profileResult.data.plan as 'free' | 'pro')
     }
-
-    setLoading(false)
+    
+    setIsInitialLoading(false) // 数据加载完成
   }
 
   async function handleSignOut() {
@@ -60,8 +59,8 @@ export default function DashboardClient({ user }: DashboardClientProps) {
     loadDashboardData()
   }, [])
 
-  // 首次使用引导
-  if (!loading && habits.length === 0) {
+  // 首次使用引导（只有加载完成且确认无习惯时才显示）
+  if (!isInitialLoading && habits.length === 0) {
     return (
       <div className="relative min-h-screen w-full overflow-x-hidden bg-gradient-to-br from-slate-900 via-indigo-900 to-slate-900">
         <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -81,7 +80,7 @@ export default function DashboardClient({ user }: DashboardClientProps) {
               欢迎来到 DailyChain
             </motion.h1>
             <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-white/70 text-lg mb-8">
-              开始创建你的第一个习惯，让改变从今天开始！
+              每一个微小的改变，都是通往美好的开始
             </motion.p>
             <motion.button
               initial={{ opacity: 0, y: 20 }}
@@ -115,17 +114,42 @@ export default function DashboardClient({ user }: DashboardClientProps) {
       </div>
 
       <div className="relative z-10">
-        {/* Top Navigation */}
+        {/* Top Navigation - 重新设计的高级头部 */}
         <motion.nav
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="sticky top-0 z-50 backdrop-blur-xl bg-white/5 border-b border-white/10"
+          className="sticky top-0 z-50 backdrop-blur-2xl bg-gradient-to-r from-slate-900/80 via-purple-900/60 to-slate-900/80 border-b border-white/10 shadow-2xl shadow-purple-500/10"
         >
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16 sm:h-20">
-              <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                DailyChain
-              </h1>
+            <div className="flex justify-between items-center h-20 sm:h-24">
+              {/* Logo 区域 - 增强视觉冲击力 */}
+              <motion.div 
+                className="flex items-center gap-3 sm:gap-4"
+                whileHover={{ scale: 1.02 }}
+                transition={{ type: "spring", stiffness: 300 }}
+              >
+                {/* 品牌图标 - 增大尺寸,添加光晕效果 */}
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-pink-500 blur-xl opacity-30 animate-pulse" />
+                  <div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-orange-500 via-pink-500 to-purple-600 p-0.5 shadow-xl shadow-orange-500/30">
+                    <div className="w-full h-full rounded-2xl bg-slate-900/90 backdrop-blur-sm flex items-center justify-center text-3xl sm:text-4xl">
+                      🔗
+                    </div>
+                  </div>
+                </div>
+                
+                {/* 品牌文案 - 唯美短语 */}
+                <div className="flex flex-col">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-wide">
+                    <span className="bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 bg-clip-text text-transparent drop-shadow-lg">
+                      因为习惯 · 所以美好
+                    </span>
+                  </h1>
+                  <p className="hidden sm:block text-xs sm:text-sm text-purple-300/90 font-medium tracking-wide mt-1">
+                    链接每一天 · 养成好习惯
+                  </p>
+                </div>
+              </motion.div>
 
               <div className="flex items-center gap-3 sm:gap-4">
                 <div className="hidden sm:block text-right">
@@ -212,15 +236,11 @@ export default function DashboardClient({ user }: DashboardClientProps) {
 
         {/* Dashboard Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
-          {loading ? (
-            <Loading />
-          ) : (
-            <>
-              {/* Stats Cards */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8"
+          {/* Stats Cards */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8"
               >
                 {[
                   { icon: "🔥", label: "连续天数", value: `${stats?.current_streak || 0}天`, color: "from-orange-500 to-red-500" },
@@ -361,8 +381,6 @@ export default function DashboardClient({ user }: DashboardClientProps) {
                   ))}
                 </div>
               </div>
-            </>
-          )}
         </div>
       </div>
     </div>

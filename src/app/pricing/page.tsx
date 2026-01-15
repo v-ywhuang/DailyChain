@@ -15,7 +15,6 @@ export default function PricingPage() {
   const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly' | null>(null)
   const [copied, setCopied] = useState(false)
   const [userId, setUserId] = useState<string>('')
-  const [loading, setLoading] = useState(true)
 
   const QR_CODE_URL = '/payment-qrcode.png'
 
@@ -31,7 +30,6 @@ export default function PricingPage() {
         // 未登录，跳转到登录页
         router.push('/login?redirect=/pricing')
       }
-      setLoading(false)
     }
     
     fetchUser()
@@ -89,16 +87,8 @@ export default function PricingPage() {
     ? `DailyChain_月付_${userId.slice(0, 8)}`
     : `DailyChain_年付_${userId.slice(0, 8)}`
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">加载中...</p>
-        </div>
-      </div>
-    )
-  }
+  // Loading 状态由页面级 Suspense 处理（顶部进度条）
+  // 用户身份验证在后台进行，不需要显示骨架屏
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-12 px-4">
