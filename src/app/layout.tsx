@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans } from 'next/font/google'
 import "./globals.css";
 import PWAInstallPrompt from '@/components/pwa-install-prompt'
 import PWARegister from '@/components/pwa-register'
+import { QueryProvider } from '@/components/providers/query-provider'
 
 // 🎨 UI/UX Pro Max - Typography: Plus Jakarta Sans (Friendly SaaS)
 const plusJakarta = Plus_Jakarta_Sans({ 
@@ -58,9 +59,11 @@ export default function RootLayout({
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
       </head>
       <body className={`${plusJakarta.variable} min-h-screen bg-background font-sans antialiased`}>
-        {children}
-        <PWARegister />
-        <PWAInstallPrompt />
+        <QueryProvider>
+          {children}
+          <PWARegister />
+          <PWAInstallPrompt />
+        </QueryProvider>
       </body>
     </html>
   );
