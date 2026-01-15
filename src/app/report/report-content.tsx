@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { getUserStats, getCheckInHeatmap } from '@/lib/api/stats'
 import { getHabitById } from '@/lib/api/habits'
@@ -51,9 +50,15 @@ export default function ReportContent() {
       }
 
       // 加载热力图数据
-      const heatmapResult = await getCheckInHeatmap(habitId || undefined)
+      const currentYear = new Date().getFullYear()
+      const heatmapResult = await getCheckInHeatmap(currentYear)
       if (heatmapResult.success && heatmapResult.data) {
-        setHeatmapData(heatmapResult.data)
+        // 转换数据格式
+        const heatmapArray: HeatmapData[] = []
+        Object.entries(heatmapResult.data).forEach(([date, count]) => {
+          heatmapArray.push({ date, count })
+        })
+        setHeatmapData(heatmapArray)
       }
 
       setLoading(false)
