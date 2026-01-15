@@ -9,9 +9,23 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 60 * 1000, // 1分钟
-            refetchOnWindowFocus: false,
+            // 🚀 激进缓存策略 - 解决中国网络慢问题
+            staleTime: 15 * 60 * 1000,  // 15分钟内数据保持新鲜
+            gcTime: 30 * 60 * 1000,  // 30分钟后清理缓存（新版 API）
+            
+            // 网络优化
+            refetchOnWindowFocus: false,  // 移动端不需要
+            refetchOnReconnect: true,  // 重连时刷新
+            retry: 2,  // 失败重试2次
+            retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 3000),
+            
+            // 保持旧数据（防止加载闪烁）
+            placeholderData: (previousData: unknown) => previousData,
           },
+          mutations: {
+            retry: 1,
+            retryDelay: 1000,
+          }
         },
       })
   )
@@ -22,3 +36,4 @@ export function QueryProvider({ children }: { children: React.ReactNode }) {
     </QueryClientProvider>
   )
 }
+
